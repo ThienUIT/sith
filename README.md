@@ -72,6 +72,39 @@ uv sync --group scripts --frozen       # + dependencies for data preparation scr
 uv sync --group experiments --frozen   # + dependencies for experiments
 ```
 
+### Windows / PowerShell quick start
+
+The project uses uv and a local `.venv`; an existing Conda environment is not
+required. If Conda is active in your terminal, run `conda deactivate` first.
+
+```powershell
+cd D:\CodingFunny\SITH
+uv python install 3.12
+uv sync --python 3.12 --managed-python --group scripts --group experiments --frozen
+uv run --frozen python -c "import sys, torch, sith; print(sys.executable); print(torch.__version__); print('CUDA:', torch.cuda.is_available())"
+```
+
+Windows installs CUDA 12.8 builds of PyTorch and torchvision from the official
+PyTorch index. A compatible NVIDIA driver is required for GPU execution.
+In VS Code, select `.venv\Scripts\python.exe` as the Python interpreter
+and select the same environment as the notebook kernel when using notebooks.
+If `uv` is not found after installation, open a new terminal or run
+`$env:Path = "$env:USERPROFILE\.local\bin;$env:Path"` in PowerShell.
+
+Download the resources and run the classification example from the repository root:
+
+```powershell
+uv run --frozen --group scripts python scripts/download_dictionary.py --dictionary conceptnet
+uv run --frozen --group scripts python scripts/download_model_data.py --model-name ViT-L-14 --pretrained laion2b_s32b_b82k
+uv run --frozen python scripts/decompose.py --model-name ViT-L-14 --pretrained laion2b_s32b_b82k --layers 20 21 22 23 --rank 64 --method comp-0.3 --sparsity 5 --dictionary conceptnet --sv-type right --fold-ln --device cuda --batch-size 8
+uv run --frozen --group experiments python experiments/classification/test.py --dataset flowers --fold-ln --filter-dictionary --num-workers 0
+```
+
+The decomposition command computes any missing layer 20-23 resources required
+by classification, and skips files that already contain complete results.
+The first experiment run also downloads model weights and the dataset. These
+commands do not require activation of `.venv`. Keep `uv.lock` under version control.
+
 ## Data
 
 All scripts and experiments expect intermediate data under `data/` in the repository root. Pre-computed resources for the experiments in the paper are available on [Google Drive](https://drive.google.com/drive/folders/1vL75AWVFsGPU-b1x6fenYdwjcAeL_OJx) and can be downloaded with:

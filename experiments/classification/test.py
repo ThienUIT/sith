@@ -125,7 +125,9 @@ def edit_model(
     class_embeds = clip.encode_text(tokenizer(class_prompts).to(args.device))
     class_embeds = F.normalize(class_embeds, dim=-1)
 
-    with open(Path("data/dictionaries") / f"{args.dictionary}.txt") as f:
+    with open(
+        Path("data/dictionaries") / f"{args.dictionary}.txt", encoding="utf-8"
+    ) as f:
         concepts = [line.strip() for line in f]
 
     dict_path = (

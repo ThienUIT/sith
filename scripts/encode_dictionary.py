@@ -55,7 +55,7 @@ def main(args: argparse.Namespace) -> None:
     torch.set_float32_matmul_precision("high")
 
     input_path = Path(f"data/dictionaries/{args.dictionary}.txt")
-    with input_path.open("r") as f:
+    with input_path.open("r", encoding="utf-8") as f:
         dictionary = f.read().splitlines()
 
     print(
